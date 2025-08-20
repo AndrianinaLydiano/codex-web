@@ -1,2 +1,2 @@
 # codex-web
-First test with openai codex code agent
+Projet: Générateur SaaS de contenu pour réseaux sociaux
