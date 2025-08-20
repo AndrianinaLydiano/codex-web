@@ -14,6 +14,7 @@ npm run dev
 - `npm run dev` – lance le serveur de développement.
 - `npm run lint` – vérifie le code avec ESLint et Prettier.
 - `npm run build` – génère la version de production.
+- `npm test` – exécute les tests (placeholder).
 
 ## Variables d'environnement
 
