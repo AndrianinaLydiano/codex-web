@@ -1,8 +1,14 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 import { supabase } from './supabaseClient';
 
+const baseURL =
+  import.meta.env.VITE_USE_FAKE_API === 'true'
+    ? 'https://example.com'
+    : import.meta.env.VITE_API_BASE_URL;
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL,
 });
 
 apiClient.interceptors.request.use(async (config) => {
@@ -16,3 +22,14 @@ apiClient.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message;
+    toast.error(message);
+    return Promise.reject(error);
+  },
+);
