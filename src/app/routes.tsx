@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
@@ -7,10 +13,30 @@ import { NewPage } from '../features/generate/NewPage';
 import { HistoryPage } from '../features/history/HistoryPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { useAuth } from '../features/auth/AuthProvider';
+import { ResetPasswordPage } from '../features/auth/ResetPasswordPage';
+import { UpdatePasswordPage } from '../features/auth/UpdatePasswordPage';
 
-const PrivateRoute = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
-  return user ? <>{children}</> : <Navigate to="/auth/login" />;
+const RequireAuth = ({ children }: { children: ReactNode }) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  if (!user) return <Navigate to="/auth/login" />;
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth/login');
+  };
+  return (
+    <div className="min-h-screen">
+      <header className="flex justify-end border-b p-4">
+        <button
+          onClick={handleSignOut}
+          className="rounded bg-gray-200 px-4 py-2"
+        >
+          Se déconnecter
+        </button>
+      </header>
+      {children}
+    </div>
+  );
 };
 
 export const AppRoutes = () => (
@@ -18,36 +44,38 @@ export const AppRoutes = () => (
     <Routes>
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
+      <Route path="/auth/reset" element={<ResetPasswordPage />} />
+      <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
       <Route
         path="/app"
         element={
-          <PrivateRoute>
+          <RequireAuth>
             <DashboardPage />
-          </PrivateRoute>
+          </RequireAuth>
         }
       />
       <Route
         path="/app/new"
         element={
-          <PrivateRoute>
+          <RequireAuth>
             <NewPage />
-          </PrivateRoute>
+          </RequireAuth>
         }
       />
       <Route
         path="/app/history"
         element={
-          <PrivateRoute>
+          <RequireAuth>
             <HistoryPage />
-          </PrivateRoute>
+          </RequireAuth>
         }
       />
       <Route
         path="/app/profile"
         element={
-          <PrivateRoute>
+          <RequireAuth>
             <ProfilePage />
-          </PrivateRoute>
+          </RequireAuth>
         }
       />
       <Route path="*" element={<Navigate to="/app" />} />
